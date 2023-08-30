@@ -1,7 +1,12 @@
 package hexlet.code.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,19 +30,19 @@ public class User {
     private Long id;
 
     @NotBlank
-    String firstName;
+    private String firstName;
 
     @NotBlank
-    String lastName;
+    private String lastName;
 
     @NotBlank
-    String email;
+    private String email;
 
     @NotBlank
     @JsonIgnore
-    String password;
+    private String password;
 
     @CreationTimestamp
     @Temporal(TIMESTAMP)
-    Timestamp createdAt;
+    private Timestamp createdAt;
 }

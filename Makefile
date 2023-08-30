@@ -21,6 +21,9 @@ dev:
 reload-classes:
 	./gradlew -t classes
 
+start:
+	./gradlew bootRun --args='--spring.profiles.active=dev'
+
 start-prod:
 	./gradlew bootRun --args='--spring.profiles.active=prod'
 
@@ -45,8 +48,8 @@ update-js-deps:
 check-java-deps:
 	./gradlew dependencyUpdates -Drevision=release
 
-# generate-migrations:
-# 	gradle diffChangeLog
+generate-migrations:
+	gradle diffChangeLog --args='--spring.profiles.active=dev'
 
 # db-migrate:
 # 	./gradlew update
