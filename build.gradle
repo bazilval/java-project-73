@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.2'
 	id 'io.spring.dependency-management' version '1.1.2'
+	id 'org.liquibase.gradle' version '2.2.0'
 	id 'application'
 	id 'checkstyle'
 	id 'jacoco'
@@ -44,11 +45,57 @@ dependencies {
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
+	implementation("org.liquibase:liquibase-core")
+	implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	liquibaseRuntime(
+			sourceSets.main.output,
+			'org.liquibase:liquibase-core',
+			'info.picocli:picocli:4.7.1',
+			'org.liquibase.ext:liquibase-hibernate6:4.21.1',
+			'org.springframework.boot:spring-boot-starter-data-jpa',
+			'com.h2database:h2',
+	)
+
+	runtimeOnly (
+			'com.h2database:h2',
+			'org.postgresql:postgresql:42.6.0'
+	)
+}
+
+
+
+
+// Настраиваем таску diffChangeLog таким образом,
+// чтобы миграции учитывали изменения в моделях
+diffChangelog {
+	dependsOn compileJava
+}
+
+// Настраиваем Liquibase
+liquibase {
+	activities {
+		main {
+			// Указываем путь, по которому будет сгенерирован файл миграции
+			changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
+			// Указывем источник, с которым будут сравниваться изменения
+			// Это база данных, изначально она пустая
+			url 'jdbc:h2:./taskManager'
+			// Сравниваем с моделями, задавая пакет
+			referenceUrl 'hibernate:spring:io.hexlet.code.model.' +
+					// Указываем диалект
+					'?dialect=org.hibernate.dialect.H2Dialect' +
+					// Указываем правила именования таблиц и столбцов,
+					// чтобы они соответствовали правилам Spring
+					'&hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy'
+		}
+	}
 }
 
 tasks.named('test') {
