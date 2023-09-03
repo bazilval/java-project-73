@@ -7,6 +7,8 @@ import hexlet.code.service.UserService;
 import hexlet.code.util.FieldErrorHandler;
 import hexlet.code.util.UserErrorResponse;
 import hexlet.code.util.exception.BadUserDataException;
+import hexlet.code.util.exception.PermissionDeniedException;
+import hexlet.code.util.exception.UserExistsExeption;
 import hexlet.code.util.exception.UserNotFoundException;
 
 import org.slf4j.Logger;
@@ -32,14 +34,14 @@ import org.springframework.validation.BindingResult;
 import java.util.List;
 
 @RestController
-@RequestMapping("${base-url}")
+@RequestMapping("${base-url}" + "/users")
 public class UserController {
     @Autowired
     private UserService service;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping("/users")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ResponseUserDTO> getUsers() {
         List<ResponseUserDTO> users = service.findAll();
@@ -48,16 +50,17 @@ public class UserController {
         return users;
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseUserDTO getUser(@PathVariable("id") Long id) {
         ResponseUserDTO userDTO = service.findById(id);
 
         LOGGER.info("User with id=" + id + " returned!");
         return userDTO;
+
     }
 
-    @PostMapping("/users")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseUserDTO createUser(@RequestBody @Valid CreateUserDTO userDTO, BindingResult bindingResult) {
         FieldErrorHandler.handleErrors(bindingResult);
@@ -68,7 +71,7 @@ public class UserController {
         return savedUserDTO;
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseUserDTO updateUser(
             @PathVariable("id") Long id,
@@ -82,7 +85,7 @@ public class UserController {
         return updatedUserDTO;
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("id") Long id) {
         service.deleteById(id);
@@ -101,6 +104,16 @@ public class UserController {
     }
 
     @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(UserExistsExeption e) {
+        UserErrorResponse response = new UserErrorResponse(
+                e.getMessage(),
+                System.currentTimeMillis());
+
+        LOGGER.info(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<UserErrorResponse> handleException(BadUserDataException e) {
         UserErrorResponse response = new UserErrorResponse(
                 e.getMessage(),
@@ -108,5 +121,15 @@ public class UserController {
 
         LOGGER.info("Request data is not valid!");
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(PermissionDeniedException e) {
+        UserErrorResponse response = new UserErrorResponse(
+                e.getMessage(),
+                System.currentTimeMillis());
+
+        LOGGER.info("Permission denied!");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }

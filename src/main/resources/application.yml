@@ -1,7 +1,19 @@
+base-url: /api
+
+jwt-token-alive-minutes: 60
+private-key: classpath:certs/private.pem
+public-key: classpath:certs/public.pem
+
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        # web: DEBUG
+        security: DEBUG
+
 server:
   port: ${PORT:5001}
-
-base-url: /api
 
 spring:
   application:

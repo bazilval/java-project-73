@@ -1,3 +1,8 @@
+jwt-secret: "test-secret"
+jwt-token-alive-minutes: 60
+private-key: classpath:certs/private.pem
+public-key: classpath:certs/public.pem
+
 base-url: "/api"
 
 spring:

@@ -8,6 +8,7 @@ import hexlet.code.dto.ResponseUserDTO;
 import hexlet.code.dto.UpdateUserDTO;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.security.JWTUtils;
 import hexlet.code.service.UserService;
 import hexlet.code.util.ModelToCreateGenerator;
 import hexlet.code.util.ModelToUpdateGenerator;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.http.MediaType;
@@ -60,11 +62,17 @@ public class UserControllerTest {
     private ObjectMapper mapper;
 
     @Autowired
+    private JWTUtils jwtUtils;
+
+    @Autowired
     private NamedRoutes routes;
+    private String token;
+
 
     @BeforeEach
     public void setUp() {
         CreateUserDTO testUser = Instancio.of(createGenerator.getUserModel()).create();
+        token = "Bearer " + jwtUtils.generateToken(testUser.getEmail());
         service.save(testUser);
     }
 
@@ -138,7 +146,8 @@ public class UserControllerTest {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = service.save(userDTO);
 
-        var request = get(baseUrl + routes.userPath(user.getId()));
+        var request = get(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -154,10 +163,12 @@ public class UserControllerTest {
     public void testUpdate() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = service.save(userDTO);
+        token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
 
         var request = put(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -175,10 +186,12 @@ public class UserControllerTest {
     public void testUpdateOneField() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = service.save(userDTO);
+        token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         String updateJSON = "{\"firstName\":\"test\"}";
 
         var request = put(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
 
@@ -193,12 +206,14 @@ public class UserControllerTest {
     public void testUpdateError() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = service.save(userDTO);
+        token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
         data.setPassword(JsonNullable.of("12"));
         data.setEmail(JsonNullable.of("notEmail"));
 
         var request = put(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -211,16 +226,56 @@ public class UserControllerTest {
         assertTrue(body.contains("Password has to contain at least 3 symbols"));
     }
 
+    public void testUpdateAnotherUser() throws Exception {
+        CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
+        ResponseUserDTO user = service.save(userDTO);
+
+        UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
+        data.setPassword(JsonNullable.of("12"));
+        data.setEmail(JsonNullable.of("notEmail"));
+
+        var request = put(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(data));
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isForbidden())
+                .andReturn();
+        String body = result.getResponse().getContentAsString();
+
+        assertTrue(body.contains("Permission denied!"));
+    }
+
     @Test
     public void testDelete() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = service.save(userDTO);
-        var request = delete(baseUrl + routes.userPath(user.getId()));
+        token = "Bearer " + jwtUtils.generateToken(user.getEmail());
+
+        var request = delete(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isNoContent());
 
         User deletedUser = repository.findById(user.getId()).orElse(null);
 
         assertNull(deletedUser);
+    }
+
+    @Test
+    public void testDeleteAnotherUser() throws Exception {
+        CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
+        ResponseUserDTO user = service.save(userDTO);
+
+        var request = delete(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token);
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isForbidden())
+                .andReturn();
+        String body = result.getResponse().getContentAsString();
+
+        assertTrue(body.contains("Permission denied!"));
     }
 }

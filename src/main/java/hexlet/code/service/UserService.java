@@ -6,6 +6,9 @@ import hexlet.code.dto.UpdateUserDTO;
 import hexlet.code.mapper.UserMapperImpl;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.exception.PermissionDeniedException;
+import hexlet.code.util.exception.UserExistsExeption;
+import hexlet.code.util.exception.UserNotFoundByEmailException;
 import hexlet.code.util.exception.UserNotFoundException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +27,9 @@ public class UserService {
     private UserRepository repository;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private UserMapperImpl mapper;
 
     @Autowired
@@ -30,6 +37,13 @@ public class UserService {
 
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO) {
+        String email = userDTO.getEmail();
+        Optional<User> existingUser = repository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            throw new UserExistsExeption(email);
+        }
+
         User user = mapper.map(userDTO);
 
         String encodedPassword = encoder.encode(user.getPassword());
@@ -60,10 +74,21 @@ public class UserService {
         return mapper.map(user);
     }
 
+    public ResponseUserDTO findByEmail(String email) {
+        User user = repository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundByEmailException(email));
+
+        return mapper.map(user);
+    }
+
     @Transactional
     public ResponseUserDTO update(Long id, UpdateUserDTO data) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!authService.hasPermissions(user)) {
+            throw new PermissionDeniedException();
+        }
 
         if (data.getPassword() != null && data.getPassword().isPresent()) {
             String encodedPassword = encoder.encode(data.getPassword().get());
@@ -80,6 +105,10 @@ public class UserService {
     public void deleteById(Long id) {
         User user = repository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!authService.hasPermissions(user)) {
+            throw new PermissionDeniedException();
+        }
 
         repository.delete(user);
     }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 public class NamedRoutes {
 
     private String path = "/users";
+    private String login = "/login";
 
     public String usersPath() {
         return path;
@@ -17,5 +18,9 @@ public class NamedRoutes {
 
     public String userPath(Long id) {
         return userPath(String.valueOf(id));
+    }
+
+    public String loginPath() {
+        return login;
     }
 }

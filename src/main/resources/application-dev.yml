@@ -1,3 +1,5 @@
+jwt-secret: secret
+
 spring:
   datasource:
     username: sa
@@ -6,6 +8,7 @@ spring:
     driverClassName: org.h2.Driver
   jpa:
     show-sql: true
+    seed: data.sql
   h2:
     console:
       enabled: true

@@ -39,8 +39,8 @@ lint:
 test:
 	./gradlew test
 
-# report:
-# 	./gradlew jacocoTestReport
+report:
+	./gradlew jacocoTestReport
 
 update-js-deps:
 	cd frontend && npx ncu -u
@@ -50,6 +50,7 @@ check-java-deps:
 
 generate-migrations:
 	gradle diffChangeLog --args='--spring.profiles.active=dev'
+
 
 # db-migrate:
 # 	./gradlew update
