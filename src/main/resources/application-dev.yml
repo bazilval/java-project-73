@@ -1,5 +1,3 @@
-jwt-secret: secret
-
 spring:
   datasource:
     username: sa

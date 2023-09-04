@@ -11,9 +11,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 @Component
 public class JWTUtils {
-    @Value("${jwt-secret}")
-    private String secret;
-
     @Value("${jwt-token-alive-minutes}")
     private int tokenAliveMinutes;
 
