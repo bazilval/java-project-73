@@ -50,19 +50,13 @@ public class SecurityConfig {
 
         http.csrf().disable()
             .authorizeHttpRequests(requests -> requests
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.swaggerPath()).permitAll()
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.swaggerPath() + "/**").permitAll()
+
                 .requestMatchers(HttpMethod.POST, baseUrl + routes.loginPath()).permitAll()
 
                 .requestMatchers(HttpMethod.GET, baseUrl + routes.usersPath()).permitAll()
                 .requestMatchers(HttpMethod.POST, baseUrl + routes.usersPath()).permitAll()
-
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.statusesPath()).permitAll()
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.statusesPath() + "/**").permitAll()
-
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.tasksPath()).permitAll()
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.tasksPath() + "/**").permitAll()
-
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.labelsPath()).permitAll()
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.labelsPath() + "/**").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

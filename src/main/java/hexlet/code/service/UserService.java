@@ -92,6 +92,14 @@ public class UserService {
             throw new PermissionDeniedException();
         }
 
+        if (data.getEmail() != null && data.getEmail().isPresent()) {
+            String email = data.getEmail().get();
+            Optional<User> existingUser = repository.findByEmail(email);
+            if (existingUser.isPresent()) {
+                throw new EntityExistsException(entityName, email);
+            }
+        }
+
         if (data.getPassword() != null && data.getPassword().isPresent()) {
             String encodedPassword = encoder.encode(data.getPassword().get());
             data.setPassword(JsonNullable.of(encodedPassword));

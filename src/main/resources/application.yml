@@ -24,3 +24,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+springdoc:
+  swagger-ui:
+    path: /api/swagger.html

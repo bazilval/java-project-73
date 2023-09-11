@@ -1,5 +1,6 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.ErrorResponse;
 import hexlet.code.dto.user.CreateUserDTO;
 import hexlet.code.dto.user.ResponseUserDTO;
 import hexlet.code.dto.user.UpdateUserDTO;
@@ -7,6 +8,13 @@ import hexlet.code.service.UserService;
 import hexlet.code.handler.FieldErrorHandler;
 
 import hexlet.code.util.exception.EntityDeleteException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +38,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url}" + "/users")
+@Tag(name = "User Management", description = "User management API")
 public class UserController {
     @Autowired
     private UserService service;
@@ -38,6 +47,14 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found users",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = List.class))
+                    }
+            )
+    })
     public List<ResponseUserDTO> getUsers() {
         List<ResponseUserDTO> users = service.findAll();
 
@@ -47,7 +64,21 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseUserDTO getUser(@PathVariable("id") Long id) {
+    @Operation(summary = "Get user by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseUserDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "User with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
+    public ResponseUserDTO getUser(
+            @Parameter(description = "User id") @PathVariable("id") Long id) {
         ResponseUserDTO userDTO = service.findById(id);
 
         LOGGER.info("User with id=" + id + " returned!");
@@ -57,7 +88,27 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseUserDTO createUser(@RequestBody @Valid CreateUserDTO userDTO, BindingResult bindingResult) {
+    @Operation(summary = "Create user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseUserDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "User with this email exists",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "422", description = "User data invalid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
+    public ResponseUserDTO createUser(
+            @Parameter(description = "User data to create") @RequestBody @Valid CreateUserDTO userDTO,
+            BindingResult bindingResult) {
         FieldErrorHandler.handleErrors(bindingResult);
 
         ResponseUserDTO savedUserDTO = service.save(userDTO);
@@ -68,9 +119,37 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Update user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseUserDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "403", description = "Permission denied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "User with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "User with this email exists",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "422", description = "User data invalid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
     public ResponseUserDTO updateUser(
-            @PathVariable("id") Long id,
-            @RequestBody @Valid UpdateUserDTO userDTO,
+            @Parameter(description = "User id") @PathVariable("id") Long id,
+            @Parameter(description = "User data to update") @RequestBody @Valid UpdateUserDTO userDTO,
             BindingResult bindingResult) {
         FieldErrorHandler.handleErrors(bindingResult);
 
@@ -82,7 +161,29 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable("id") Long id) {
+    @Operation(summary = "Delete user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User deleted",
+                    content = @Content
+            ),
+            @ApiResponse(responseCode = "403", description = "Permission denied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "User with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "User can not be deleted",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
+    public void deleteUser(
+            @Parameter(description = "User id") @PathVariable("id") Long id) {
 
         try {
             service.deleteById(id);

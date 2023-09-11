@@ -1,9 +1,17 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.ErrorResponse;
 import hexlet.code.dto.LabelDTO;
 import hexlet.code.handler.FieldErrorHandler;
 import hexlet.code.service.LabelService;
 import hexlet.code.util.exception.EntityDeleteException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +33,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url}" + "/labels")
+@Tag(name = "Label Management", description = "Label management API")
 public class LabelController {
     @Autowired
     private LabelService service;
@@ -32,7 +41,15 @@ public class LabelController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<LabelDTO> getLabeles() {
+    @Operation(summary = "Get all labels")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found labels",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = List.class))
+                    }
+            )
+    })
+    public List<LabelDTO> getLabels() {
         List<LabelDTO> labels = service.findAll();
 
         LOGGER.info("All labels returned!");
@@ -41,7 +58,21 @@ public class LabelController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LabelDTO getLabel(@PathVariable("id") Long id) {
+    @Operation(summary = "Get label by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Label found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LabelDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
+    public LabelDTO getLabel(
+            @Parameter(description = "Label id") @PathVariable("id") Long id) {
         LabelDTO labelDTO = service.findById(id);
 
         LOGGER.info("Label with id=" + id + " returned!");
@@ -51,7 +82,32 @@ public class LabelController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LabelDTO createLabel(@RequestBody @Valid LabelDTO labelDTO, BindingResult bindingResult) {
+    @Operation(summary = "Create label")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Label created",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LabelDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "403", description = "Permission denied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "Label with this name exists",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "422", description = "Label data invalid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
+    public LabelDTO createLabel(
+            @Parameter(description = "Label data to create") @RequestBody @Valid LabelDTO labelDTO,
+            BindingResult bindingResult) {
         FieldErrorHandler.handleErrors(bindingResult);
 
         LabelDTO savedLabelDTO = service.save(labelDTO);
@@ -62,9 +118,37 @@ public class LabelController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Update label")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Label updated",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LabelDTO.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "403", description = "Permission denied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "Label with this name exists",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "422", description = "Label data invalid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
     public LabelDTO updateLabel(
-            @PathVariable("id") Long id,
-            @RequestBody @Valid LabelDTO labelDTO,
+            @Parameter(description = "Label id") @PathVariable("id") Long id,
+            @Parameter(description = "Label data to update") @RequestBody @Valid LabelDTO labelDTO,
             BindingResult bindingResult) {
         FieldErrorHandler.handleErrors(bindingResult);
 
@@ -76,6 +160,27 @@ public class LabelController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete label")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Label deleted",
+                    content = @Content
+            ),
+            @ApiResponse(responseCode = "403", description = "Permission denied",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            ),
+            @ApiResponse(responseCode = "409", description = "Label can not be deleted",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+                    }
+            )
+    })
     public void deleteLabel(@PathVariable("id") Long id) {
 
         try {

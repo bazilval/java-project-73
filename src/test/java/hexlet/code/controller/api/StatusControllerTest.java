@@ -86,7 +86,9 @@ public class StatusControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult result = mockMvc.perform(get(baseUrl + routes.statusesPath()))
+        var request = get(baseUrl + routes.statusesPath())
+                .header(HttpHeaders.AUTHORIZATION, token);
+        MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
         String body = result.getResponse().getContentAsString();
@@ -142,7 +144,8 @@ public class StatusControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.statusPath(statusId));
+        var request = get(baseUrl + routes.statusPath(statusId))
+                .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();

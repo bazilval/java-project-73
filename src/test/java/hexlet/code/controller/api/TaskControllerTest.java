@@ -102,7 +102,8 @@ public class TaskControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var request = get(baseUrl + routes.tasksPath());
+        var request = get(baseUrl + routes.tasksPath())
+                .header(HttpHeaders.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -129,7 +130,8 @@ public class TaskControllerTest {
         taskRepository.save(task);
 
         var request = get(baseUrl + routes.tasksPath())
-                .queryParam("labelsId", label.getId().toString());
+                .queryParam("labelsId", label.getId().toString())
+                .header(HttpHeaders.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -198,7 +200,8 @@ public class TaskControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.taskPath(taskId));
+        var request = get(baseUrl + routes.taskPath(taskId))
+                .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();

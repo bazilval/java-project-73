@@ -1,8 +1,8 @@
 package hexlet.code.service;
 
+import com.querydsl.core.types.Predicate;
 import hexlet.code.dto.task.CreateTaskDTO;
 import hexlet.code.dto.task.ResponseTaskDTO;
-import hexlet.code.dto.task.TaskFilterDTO;
 import hexlet.code.dto.task.UpdateTaskDTO;
 import hexlet.code.mapper.TaskMapperImpl;
 import hexlet.code.model.Label;
@@ -13,7 +13,6 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.StatusRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
-import hexlet.code.specification.TaskSpecifications;
 import hexlet.code.util.exception.EntityNotFoundByNameException;
 import hexlet.code.util.exception.EntityNotFoundException;
 import hexlet.code.util.exception.PermissionDeniedException;
@@ -25,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional(readOnly = true)
@@ -89,14 +89,10 @@ public class TaskService {
         return mapper.map(task);
     }
 
-    public List<ResponseTaskDTO> findAll(TaskFilterDTO taskFilter) {
-        List<Task> tasks = taskRepository.findAll(TaskSpecifications.toSpecification(taskFilter));
+    public List<ResponseTaskDTO> findAll(Predicate predicate) {
+        Iterable<Task> tasks = taskRepository.findAll(predicate);
 
-        if (tasks.isEmpty()) {
-            return List.of();
-        }
-
-        List<ResponseTaskDTO> tasksDTO = tasks.stream()
+        List<ResponseTaskDTO> tasksDTO = StreamSupport.stream(tasks.spliterator(), false)
                 .map(task -> mapper.map(task))
                 .collect(Collectors.toList());
 

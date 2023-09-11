@@ -86,6 +86,13 @@ public class StatusService {
         Status status = statusRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName, id));
 
+        String name = data.getName();
+        Optional<Status> existingStatus = statusRepository.findByName(name);
+
+        if (existingStatus.isPresent()) {
+            throw new EntityExistsException(entityName, name);
+        }
+
         mapper.update(data, status);
         Status updatedStatus = statusRepository.findById(id).get();
 

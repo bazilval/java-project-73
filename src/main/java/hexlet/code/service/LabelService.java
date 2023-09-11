@@ -86,6 +86,13 @@ public class LabelService {
         Label label = labelRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName, id));
 
+        String name = data.getName();
+        Optional<Label> existingLabel = labelRepository.findByName(name);
+
+        if (existingLabel.isPresent()) {
+            throw new EntityExistsException(entityName, name);
+        }
+
         mapper.update(data, label);
         Label updatedLabel = labelRepository.findById(id).get();
 

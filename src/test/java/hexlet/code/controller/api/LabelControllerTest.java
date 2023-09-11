@@ -98,7 +98,10 @@ public class LabelControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult result = mockMvc.perform(get(baseUrl + routes.labelsPath()))
+        var request = get(baseUrl + routes.labelsPath())
+                .header(HttpHeaders.AUTHORIZATION, token);
+
+        MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
         String body = result.getResponse().getContentAsString();
@@ -154,7 +157,8 @@ public class LabelControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.labelPath(labelId));
+        var request = get(baseUrl + routes.labelPath(labelId))
+                .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
