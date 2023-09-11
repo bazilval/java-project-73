@@ -1,21 +1,17 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.CreateUserDTO;
-import hexlet.code.dto.ResponseUserDTO;
-import hexlet.code.dto.UpdateUserDTO;
+import hexlet.code.dto.user.CreateUserDTO;
+import hexlet.code.dto.user.ResponseUserDTO;
+import hexlet.code.dto.user.UpdateUserDTO;
 import hexlet.code.service.UserService;
-import hexlet.code.util.FieldErrorHandler;
-import hexlet.code.util.UserErrorResponse;
-import hexlet.code.util.exception.BadUserDataException;
-import hexlet.code.util.exception.PermissionDeniedException;
-import hexlet.code.util.exception.UserExistsExeption;
-import hexlet.code.util.exception.UserNotFoundException;
+import hexlet.code.handler.FieldErrorHandler;
 
+import hexlet.code.util.exception.EntityDeleteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
@@ -88,48 +83,13 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("id") Long id) {
-        service.deleteById(id);
+
+        try {
+            service.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new EntityDeleteException("User", id);
+        }
 
         LOGGER.info("User with id=" + id + " deleted!");
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(UserNotFoundException e) {
-        UserErrorResponse response = new UserErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis());
-
-        LOGGER.info(e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(UserExistsExeption e) {
-        UserErrorResponse response = new UserErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis());
-
-        LOGGER.info(e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(BadUserDataException e) {
-        UserErrorResponse response = new UserErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis());
-
-        LOGGER.info("Request data is not valid!");
-        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(PermissionDeniedException e) {
-        UserErrorResponse response = new UserErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis());
-
-        LOGGER.info("Permission denied!");
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }

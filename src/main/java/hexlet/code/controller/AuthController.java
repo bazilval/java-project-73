@@ -1,9 +1,8 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.AuthDTO;
-import hexlet.code.dto.TokenDTO;
 import hexlet.code.service.AuthService;
-import hexlet.code.util.UserErrorResponse;
+import hexlet.code.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +23,16 @@ public class AuthController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public TokenDTO login(@RequestBody AuthDTO authDTO) {
+    public String login(@RequestBody AuthDTO authDTO) {
         authService.authenticate(authDTO);
 
         LOGGER.info("Authentication of " + authDTO.getUsername() + " successful!");
-        return authService.generateTokenDTO(authDTO);
+        return authService.generateToken(authDTO);
     }
 
     @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(AuthenticationException e) {
-        UserErrorResponse response = new UserErrorResponse(
+    public ResponseEntity<ErrorResponse> handleException(AuthenticationException e) {
+        ErrorResponse response = new ErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis());
 

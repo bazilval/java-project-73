@@ -1,6 +1,6 @@
 package hexlet.code.util;
 
-import hexlet.code.dto.CreateUserDTO;
+import hexlet.code.dto.user.CreateUserDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;
@@ -21,8 +21,6 @@ public class ModelToCreateGenerator {
     @PostConstruct
     private void init() {
         userModel = Instancio.of(CreateUserDTO.class)
-                .ignore(Select.field(CreateUserDTO::getId))
-                .ignore(Select.field(CreateUserDTO::getCreatedAt))
                 .supply(Select.field(CreateUserDTO::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(CreateUserDTO::getLastName), () -> faker.name().lastName())
                 .supply(Select.field(CreateUserDTO::getEmail), () -> faker.internet().emailAddress())

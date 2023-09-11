@@ -44,16 +44,25 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   HandlerMappingIntrospector introspector)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
             throws Exception {
         MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
 
         http.csrf().disable()
             .authorizeHttpRequests(requests -> requests
+                .requestMatchers(HttpMethod.POST, baseUrl + routes.loginPath()).permitAll()
+
                 .requestMatchers(HttpMethod.GET, baseUrl + routes.usersPath()).permitAll()
                 .requestMatchers(HttpMethod.POST, baseUrl + routes.usersPath()).permitAll()
-                .requestMatchers(HttpMethod.POST, baseUrl + routes.loginPath()).permitAll()
+
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.statusesPath()).permitAll()
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.statusesPath() + "/**").permitAll()
+
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.tasksPath()).permitAll()
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.tasksPath() + "/**").permitAll()
+
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.labelsPath()).permitAll()
+                .requestMatchers(HttpMethod.GET, baseUrl + routes.labelsPath() + "/**").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

@@ -1,7 +1,7 @@
 package hexlet.code.mapper;
 
-import hexlet.code.dto.ResponseUserDTO;
-import hexlet.code.dto.UpdateUserDTO;
+import hexlet.code.dto.user.ResponseUserDTO;
+import hexlet.code.dto.user.UpdateUserDTO;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import hexlet.code.dto.CreateUserDTO;
+import hexlet.code.dto.user.CreateUserDTO;
 import hexlet.code.model.User;
 
 @Mapper(
@@ -30,7 +30,7 @@ public abstract class UserMapper {
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "createdAt", source = "createdAt", dateFormat = "yyyy-MM-dd hh:mm:ss")
+    @Mapping(target = "createdAt", source = "createdAt")
     public abstract ResponseUserDTO map(User model);
 
     @Mapping(target = "id", ignore = true)

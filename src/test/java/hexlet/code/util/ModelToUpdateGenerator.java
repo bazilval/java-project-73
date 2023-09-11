@@ -1,6 +1,6 @@
 package hexlet.code.util;
 
-import hexlet.code.dto.UpdateUserDTO;
+import hexlet.code.dto.user.UpdateUserDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;

@@ -1,15 +1,15 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.CreateUserDTO;
-import hexlet.code.dto.ResponseUserDTO;
-import hexlet.code.dto.UpdateUserDTO;
+import hexlet.code.dto.user.CreateUserDTO;
+import hexlet.code.dto.user.ResponseUserDTO;
+import hexlet.code.dto.user.UpdateUserDTO;
 import hexlet.code.mapper.UserMapperImpl;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.exception.EntityExistsException;
+import hexlet.code.util.exception.EntityNotFoundByNameException;
+import hexlet.code.util.exception.EntityNotFoundException;
 import hexlet.code.util.exception.PermissionDeniedException;
-import hexlet.code.util.exception.UserExistsExeption;
-import hexlet.code.util.exception.UserNotFoundByEmailException;
-import hexlet.code.util.exception.UserNotFoundException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,13 +35,15 @@ public class UserService {
     @Autowired
     private PasswordEncoder encoder;
 
+    private final String entityName = "User";
+
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO) {
         String email = userDTO.getEmail();
         Optional<User> existingUser = repository.findByEmail(email);
 
         if (existingUser.isPresent()) {
-            throw new UserExistsExeption(email);
+            throw new EntityExistsException(entityName, email);
         }
 
         User user = mapper.map(userDTO);
@@ -69,14 +71,14 @@ public class UserService {
 
     public ResponseUserDTO findById(Long id) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(entityName, id));
 
         return mapper.map(user);
     }
 
     public ResponseUserDTO findByEmail(String email) {
         User user = repository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundByEmailException(email));
+                .orElseThrow(() -> new EntityNotFoundByNameException(entityName, email));
 
         return mapper.map(user);
     }
@@ -84,7 +86,7 @@ public class UserService {
     @Transactional
     public ResponseUserDTO update(Long id, UpdateUserDTO data) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(entityName, id));
 
         if (!authService.hasPermissions(user)) {
             throw new PermissionDeniedException();
@@ -104,7 +106,7 @@ public class UserService {
     @Transactional
     public void deleteById(Long id) {
         User user = repository.findById(id)
-                        .orElseThrow(() -> new UserNotFoundException(id));
+                        .orElseThrow(() -> new EntityNotFoundException(entityName, id));
 
         if (!authService.hasPermissions(user)) {
             throw new PermissionDeniedException();

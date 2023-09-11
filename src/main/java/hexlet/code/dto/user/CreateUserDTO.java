@@ -1,23 +1,27 @@
-package hexlet.code.dto;
+package hexlet.code.dto.user;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import org.openapitools.jackson.nullable.JsonNullable;
 
 @Getter
 @Setter
-public class UpdateUserDTO {
+public class CreateUserDTO {
+    @NotBlank(message = "Firstname cannot be empty")
     @Length(min = 1, message = "Firstname has to contain at least 1 symbol")
-    private JsonNullable<String> firstName;
+    private String firstName;
 
+    @NotBlank(message = "Lastname cannot be empty")
     @Length(min = 1, message = "Lastname has to contain at least 1 symbol")
-    private JsonNullable<String> lastName;
+    private String lastName;
 
+    @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email has to be correct")
-    private JsonNullable<String> email;
+    private String email;
 
+    @NotBlank(message = "Password cannot be empty")
     @Length(min = 3, message = "Password has to contain at least 3 symbols")
-    private JsonNullable<String> password;
+    private String password;
 }

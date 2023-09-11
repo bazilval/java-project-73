@@ -2,15 +2,16 @@
 
 import path from 'path';
 
-// const hostname = 'localhost';
-// const port = process.env.REACT_APP_PORT || 5001;
+const hostname = 'localhost';
+const port = process.env.REACT_APP_PORT || 5001;
 const apiUrl = '/api';
-const { host, protocol } = window.location;
-const fullHost = `${protocol}//${host}`;
+const { protocol } = window.location;
+// const fullHost = `${protocol}//${host}`;
 
 const buildUrl = (part) => () => {
   const urlPath = path.join(apiUrl, part);
-  const url = new URL(urlPath, fullHost);
+  const apiHost = `${protocol}//${hostname}:${port}`;
+  const url = new URL(urlPath, apiHost);
   return url.toString();
 };
 

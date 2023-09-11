@@ -1,6 +1,6 @@
-package hexlet.code.util;
+package hexlet.code.handler;
 
-import hexlet.code.util.exception.BadUserDataException;
+import hexlet.code.util.exception.BadDataException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -11,7 +11,7 @@ public class FieldErrorHandler {
     public static void handleErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = collectMessages(bindingResult);
-            throw new BadUserDataException(errorMessage);
+            throw new BadDataException(errorMessage);
         }
     };
     private static String collectMessages(BindingResult bindingResult) {

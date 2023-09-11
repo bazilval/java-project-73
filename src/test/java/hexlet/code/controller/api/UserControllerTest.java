@@ -3,10 +3,14 @@ package hexlet.code.controller.api;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 
-import hexlet.code.dto.CreateUserDTO;
-import hexlet.code.dto.ResponseUserDTO;
-import hexlet.code.dto.UpdateUserDTO;
+import hexlet.code.dto.user.CreateUserDTO;
+import hexlet.code.dto.user.ResponseUserDTO;
+import hexlet.code.dto.user.UpdateUserDTO;
+import hexlet.code.model.Status;
+import hexlet.code.model.Task;
 import hexlet.code.model.User;
+import hexlet.code.repository.StatusRepository;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.security.JWTUtils;
 import hexlet.code.service.UserService;
@@ -49,10 +53,16 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserService service;
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private StatusRepository statusRepository;
+
+    @Autowired
+    private UserService userService;
     @Autowired
     private ModelToCreateGenerator createGenerator;
 
@@ -71,9 +81,13 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
+        taskRepository.deleteAll();
+        userRepository.deleteAll();
+        statusRepository.deleteAll();
+
         CreateUserDTO testUser = Instancio.of(createGenerator.getUserModel()).create();
         token = "Bearer " + jwtUtils.generateToken(testUser.getEmail());
-        service.save(testUser);
+        userService.save(testUser);
     }
 
     @Test
@@ -95,7 +109,7 @@ public class UserControllerTest {
 
         mockMvc.perform(request).andExpect(status().isCreated());
 
-        var user = repository.findByEmail(data.getEmail()).get();
+        var user = userRepository.findByEmail(data.getEmail()).get();
 
         assertNotNull(user);
         assertEquals(data.getFirstName(), user.getFirstName());
@@ -144,7 +158,7 @@ public class UserControllerTest {
     @Test
     public void testShow() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
 
         var request = get(baseUrl + routes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
@@ -162,7 +176,7 @@ public class UserControllerTest {
     @Test
     public void testUpdate() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
@@ -174,7 +188,7 @@ public class UserControllerTest {
 
         mockMvc.perform(request).andExpect(status().isOk());
 
-        User updatedUser = repository.findById(user.getId()).orElse(null);
+        User updatedUser = userRepository.findById(user.getId()).orElse(null);
 
         assertEquals(data.getFirstName().get(), updatedUser.getFirstName());
         assertEquals(data.getLastName().get(), updatedUser.getLastName());
@@ -185,7 +199,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateOneField() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         String updateJSON = "{\"firstName\":\"test\"}";
@@ -197,7 +211,7 @@ public class UserControllerTest {
 
         mockMvc.perform(request).andExpect(status().isOk());
 
-        User updatedUser = repository.findById(user.getId()).orElse(null);
+        User updatedUser = userRepository.findById(user.getId()).orElse(null);
 
         assertEquals("test", updatedUser.getFirstName());
     }
@@ -205,7 +219,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateError() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
@@ -228,7 +242,7 @@ public class UserControllerTest {
 
     public void testUpdateAnotherUser() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
         data.setPassword(JsonNullable.of("12"));
@@ -250,7 +264,7 @@ public class UserControllerTest {
     @Test
     public void testDelete() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
         var request = delete(baseUrl + routes.userPath(user.getId()))
@@ -258,7 +272,7 @@ public class UserControllerTest {
 
         mockMvc.perform(request).andExpect(status().isNoContent());
 
-        User deletedUser = repository.findById(user.getId()).orElse(null);
+        User deletedUser = userRepository.findById(user.getId()).orElse(null);
 
         assertNull(deletedUser);
     }
@@ -266,7 +280,7 @@ public class UserControllerTest {
     @Test
     public void testDeleteAnotherUser() throws Exception {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
-        ResponseUserDTO user = service.save(userDTO);
+        ResponseUserDTO user = userService.save(userDTO);
 
         var request = delete(baseUrl + routes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
@@ -277,5 +291,33 @@ public class UserControllerTest {
         String body = result.getResponse().getContentAsString();
 
         assertTrue(body.contains("Permission denied!"));
+    }
+
+    @Test
+    public void testDeleteWithTask() throws Exception {
+        CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
+        ResponseUserDTO user = userService.save(userDTO);
+        User createdUser = userRepository.findById(user.getId()).get();
+        token = "Bearer " + jwtUtils.generateToken(user.getEmail());
+
+        Status status = new Status("В работе");
+        statusRepository.save(status);
+
+        Task task = new Task();
+        task.setName("Test");
+        task.setTaskStatus(status);
+        task.setAuthor(createdUser);
+        task.setExecutor(createdUser);
+
+        taskRepository.save(task);
+
+        var request = delete(baseUrl + routes.userPath(user.getId()))
+                .header(HttpHeaders.AUTHORIZATION, token);
+
+        mockMvc.perform(request).andExpect(status().isConflict());
+
+        User deletedUser = userRepository.findById(user.getId()).orElse(null);
+
+        assertNotNull(deletedUser);
     }
 }

@@ -1,4 +1,4 @@
-package hexlet.code.util;
+package hexlet.code.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserErrorResponse {
+public class ErrorResponse {
     private String message;
     private long timestamp;
 }
