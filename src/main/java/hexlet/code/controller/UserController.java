@@ -67,7 +67,6 @@ public class UserController {
     public List<ResponseUserDTO> getUsers() {
         List<ResponseUserDTO> users = service.findAll();
 
-        //rollbar.debug("Test rollbar message");
         LOGGER.info("All users returned!");
         return users;
     }
@@ -174,7 +173,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete user")
     @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {

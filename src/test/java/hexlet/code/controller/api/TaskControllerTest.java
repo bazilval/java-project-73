@@ -263,7 +263,7 @@ public class TaskControllerTest {
         var request = delete(baseUrl + routes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
-        mockMvc.perform(request).andExpect(status().isNoContent());
+        mockMvc.perform(request).andExpect(status().isOk());
 
         Task deletedTask = taskRepository.findById(statusId).orElse(null);
 

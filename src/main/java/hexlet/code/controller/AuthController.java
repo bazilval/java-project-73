@@ -42,7 +42,7 @@ public class AuthController {
             @Parameter(description = "Auth credentials") @RequestBody AuthDTO authDTO) {
         authService.authenticate(authDTO);
 
-        LOGGER.info("Authentication of " + authDTO.getUsername() + " successful!");
+        LOGGER.info("Authentication of " + authDTO.getEmail() + " successful!");
         return authService.generateToken(authDTO);
     }
 }

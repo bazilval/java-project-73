@@ -174,7 +174,7 @@ public class StatusController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete status")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Status deleted",

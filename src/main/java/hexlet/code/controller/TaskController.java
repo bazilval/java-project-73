@@ -177,7 +177,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Delete task")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Task deleted",

@@ -25,13 +25,13 @@ public class AuthService {
 
     public void authenticate(AuthDTO dto) {
         var auth = new UsernamePasswordAuthenticationToken(
-                dto.getUsername(),
+                dto.getEmail(),
                 dto.getPassword());
         authenticationManager.authenticate(auth);
     }
 
     public String generateToken(AuthDTO dto) {
-        String token = jwtUtils.generateToken(dto.getUsername());
+        String token = jwtUtils.generateToken(dto.getEmail());
         return token;
     }
 

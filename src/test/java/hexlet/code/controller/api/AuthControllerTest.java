@@ -62,7 +62,7 @@ public class AuthControllerTest {
         mockMvc.perform(request);
 
         AuthDTO authDTO = new AuthDTO();
-        authDTO.setUsername(data.getEmail());
+        authDTO.setEmail(data.getEmail());
         authDTO.setPassword(data.getPassword());
 
         var loginRequest = post(baseUrl + routes.loginPath())
@@ -88,7 +88,7 @@ public class AuthControllerTest {
     @Test
     public void testLoginError() throws Exception {
         AuthDTO authDTO = new AuthDTO();
-        authDTO.setUsername("wrongLogin");
+        authDTO.setEmail("wrongLogin");
         authDTO.setPassword("wrongPassword");
 
         var loginRequest = post(baseUrl + routes.loginPath())

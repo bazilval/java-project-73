@@ -6,10 +6,8 @@ import com.rollbar.spring.webmvc.RollbarSpringConfigBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
-@EnableWebMvc
 public class RollbarConfig {
     /**
      * Register a Rollbar bean to configure App with Rollbar.

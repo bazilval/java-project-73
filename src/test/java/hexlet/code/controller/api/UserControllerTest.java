@@ -270,7 +270,7 @@ public class UserControllerTest {
         var request = delete(baseUrl + routes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
-        mockMvc.perform(request).andExpect(status().isNoContent());
+        mockMvc.perform(request).andExpect(status().isOk());
 
         User deletedUser = userRepository.findById(user.getId()).orElse(null);
 
