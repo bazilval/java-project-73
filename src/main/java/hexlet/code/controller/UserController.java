@@ -1,5 +1,6 @@
 package hexlet.code.controller;
 
+import com.rollbar.notifier.Rollbar;
 import hexlet.code.dto.ErrorResponse;
 import hexlet.code.dto.user.CreateUserDTO;
 import hexlet.code.dto.user.ResponseUserDTO;
@@ -48,6 +49,9 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    @Autowired
+    private Rollbar rollbar;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
@@ -63,6 +67,7 @@ public class UserController {
     public List<ResponseUserDTO> getUsers() {
         List<ResponseUserDTO> users = service.findAll();
 
+        //rollbar.debug("Test rollbar message");
         LOGGER.info("All users returned!");
         return users;
     }

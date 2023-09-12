@@ -8,3 +8,4 @@ spring:
 logging:
   level:
     ROOT: INFO
+rollbar-token: ${ROLLBAR_TOKEN}
