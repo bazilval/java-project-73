@@ -28,10 +28,10 @@ public class AuthController {
 
     @Operation(summary = "Login with username and password")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login successful, token returned",
+        @ApiResponse(responseCode = "200", description = "Login successful, token returned",
                     content = @Content
             ),
-            @ApiResponse(responseCode = "401", description = "Invalid username or password",
+        @ApiResponse(responseCode = "401", description = "Invalid username or password",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class))
                     }

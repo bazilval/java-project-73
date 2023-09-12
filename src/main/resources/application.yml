@@ -26,4 +26,4 @@ spring:
       ddl-auto: validate
 springdoc:
   swagger-ui:
-    path: /api/swagger.html
+    path: /swagger

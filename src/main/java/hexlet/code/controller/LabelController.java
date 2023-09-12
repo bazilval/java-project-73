@@ -7,10 +7,12 @@ import hexlet.code.service.LabelService;
 import hexlet.code.util.exception.EntityDeleteException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import java.util.List;
 @RestController
 @RequestMapping("${base-url}" + "/labels")
 @Tag(name = "Label Management", description = "Label management API")
+@SecurityRequirement(name = "Bearer Authentication")
 public class LabelController {
     @Autowired
     private LabelService service;
@@ -43,10 +46,13 @@ public class LabelController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all labels")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found labels",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = List.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Found labels",
+                content = {@Content(mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = LabelDTO.class)))
+                }
+            ),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = @Content
             )
     })
     public List<LabelDTO> getLabels() {
@@ -60,15 +66,18 @@ public class LabelController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get label by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Label found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LabelDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Label found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = LabelDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "404", description = "Label with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = @Content
+            ),
+        @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public LabelDTO getLabel(
@@ -84,25 +93,23 @@ public class LabelController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create label")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Label created",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LabelDTO.class))
-                    }
+        @ApiResponse(responseCode = "201", description = "Label created",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = LabelDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "409", description = "Label with this name exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "Label with this name exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "Label data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "422", description = "Label data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public LabelDTO createLabel(
@@ -120,30 +127,33 @@ public class LabelController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update label")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Label updated",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LabelDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Label updated",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = LabelDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "Label with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "Label with this name exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "Label data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "Label with this name exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "422", description = "Label data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public LabelDTO updateLabel(
@@ -162,23 +172,26 @@ public class LabelController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete label")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Label deleted",
-                    content = @Content
+        @ApiResponse(responseCode = "204", description = "Label deleted",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "Label with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "Label can not be deleted",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "Label with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "409", description = "Label can not be deleted",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public void deleteLabel(@PathVariable("id") Long id) {

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class NamedRoutes {
 
-    private final String swaggerPath = "/swagger.html";
     private final String usersPath = "/users";
     private final String login = "/login";
     private final String statusesPath = "/statuses";
@@ -62,8 +61,5 @@ public class NamedRoutes {
 
     public String labelPath(Long id) {
         return labelPath(String.valueOf(id));
-    }
-    public String swaggerPath() {
-        return swaggerPath;
     }
 }

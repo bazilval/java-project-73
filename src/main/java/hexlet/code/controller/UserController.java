@@ -10,10 +10,14 @@ import hexlet.code.handler.FieldErrorHandler;
 import hexlet.code.util.exception.EntityDeleteException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,7 @@ import java.util.List;
 @RestController
 @RequestMapping("${base-url}" + "/users")
 @Tag(name = "User Management", description = "User management API")
+@SecurityScheme(type = SecuritySchemeType.OAUTH2)
 public class UserController {
     @Autowired
     private UserService service;
@@ -49,10 +54,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all users")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found users",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = List.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Found users",
+                content = {@Content(mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = ResponseUserDTO.class)))
+                }
             )
     })
     public List<ResponseUserDTO> getUsers() {
@@ -66,15 +71,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get user by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseUserDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "User found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ResponseUserDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "404", description = "User with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "User with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public ResponseUserDTO getUser(
@@ -90,20 +95,20 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User created",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseUserDTO.class))
-                    }
+        @ApiResponse(responseCode = "201", description = "User created",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ResponseUserDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "User with this email exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "User with this email exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "User data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "422", description = "User data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public ResponseUserDTO createUser(
@@ -120,31 +125,35 @@ public class UserController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update user")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User updated",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseUserDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "User updated",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ResponseUserDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "User with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "User with this email exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "User with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "User data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "User with this email exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "422", description = "User data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public ResponseUserDTO updateUser(
@@ -162,24 +171,28 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete user")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "User deleted",
-                    content = @Content
+        @ApiResponse(responseCode = "204", description = "User deleted",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "User with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "User can not be deleted",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "User with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "409", description = "User can not be deleted",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public void deleteUser(

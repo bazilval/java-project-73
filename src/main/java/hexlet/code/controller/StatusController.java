@@ -7,10 +7,12 @@ import hexlet.code.handler.FieldErrorHandler;
 import hexlet.code.util.exception.EntityDeleteException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import java.util.List;
 @RestController
 @RequestMapping("${base-url}" + "/statuses")
 @Tag(name = "Status Management", description = "Status management API")
+@SecurityRequirement(name = "Bearer Authentication")
 public class StatusController {
     @Autowired
     private StatusService service;
@@ -43,11 +46,14 @@ public class StatusController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all statuses")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found statuses",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = List.class))
-                    }
-            )
+        @ApiResponse(responseCode = "200", description = "Found statuses",
+                content = {@Content(mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = StatusDTO.class)))
+                }
+            ),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
+            ),
     })
     public List<StatusDTO> getStatuses() {
         List<StatusDTO> statuses = service.findAll();
@@ -60,15 +66,18 @@ public class StatusController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get status by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = StatusDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Status found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = StatusDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "404", description = "Status with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
+            ),
+        @ApiResponse(responseCode = "404", description = "Status with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public StatusDTO getStatus(
@@ -84,25 +93,28 @@ public class StatusController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Status created",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = StatusDTO.class))
-                    }
+        @ApiResponse(responseCode = "201", description = "Status created",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = StatusDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "409", description = "Status with this name exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "Status data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "Status with this name exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "422", description = "Status data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public StatusDTO createStatus(
@@ -120,30 +132,33 @@ public class StatusController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status updated",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = StatusDTO.class))
-                    }
+        @ApiResponse(responseCode = "200", description = "Status updated",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = StatusDTO.class))
+                }
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "Status with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "Status with this name exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "Status with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "422", description = "Status data invalid",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "409", description = "Status with this name exists",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "422", description = "Status data invalid",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public StatusDTO updateStatus(
@@ -162,23 +177,26 @@ public class StatusController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Status deleted",
-                    content = @Content
+        @ApiResponse(responseCode = "204", description = "Status deleted",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "403", description = "Permission denied",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "401", description = "Unauthorized user can not do this",
+                content = @Content
             ),
-            @ApiResponse(responseCode = "404", description = "Status with this id not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "403", description = "Permission denied",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             ),
-            @ApiResponse(responseCode = "409", description = "Status can not be deleted",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
-                    }
+        @ApiResponse(responseCode = "404", description = "Status with this id not found",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
+            ),
+        @ApiResponse(responseCode = "409", description = "Status can not be deleted",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class))
+                }
             )
     })
     public void deleteStatus(
