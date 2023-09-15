@@ -5,61 +5,61 @@ import org.springframework.stereotype.Component;
 @Component
 public class NamedRoutes {
 
-    private final String usersPath = "/users";
-    private final String login = "/login";
-    private final String statusesPath = "/statuses";
-    private final String tasksPath = "/tasks";
-    private final String labelsPath = "/labels";
+    private static final String USERS_PATH = "/users";
+    private static final String LOGIN = "/login";
+    private static final String STATUSES_PATH = "/statuses";
+    private static final String TASKS_PATH = "/tasks";
+    private static final String LABELS_PATH = "/labels";
 
-    public String usersPath() {
-        return usersPath;
+    public static String usersPath() {
+        return USERS_PATH;
     }
 
-    public String userPath(String id) {
-        return usersPath + "/" + id;
+    public static String userPath(String id) {
+        return USERS_PATH + "/" + id;
     }
 
-    public String userPath(Long id) {
+    public static String userPath(Long id) {
         return userPath(String.valueOf(id));
     }
 
-    public String loginPath() {
-        return login;
+    public static String loginPath() {
+        return LOGIN;
     }
 
-    public String statusesPath() {
-        return statusesPath;
+    public static String statusesPath() {
+        return STATUSES_PATH;
     }
 
-    public String statusPath(String id) {
-        return statusesPath + "/" + id;
+    public static String statusPath(String id) {
+        return STATUSES_PATH + "/" + id;
     }
 
-    public String statusPath(Long id) {
+    public static String statusPath(Long id) {
         return statusPath(String.valueOf(id));
     }
 
-    public String tasksPath() {
-        return tasksPath;
+    public static String tasksPath() {
+        return TASKS_PATH;
     }
 
-    public String taskPath(String id) {
-        return tasksPath + "/" + id;
+    public static String taskPath(String id) {
+        return TASKS_PATH + "/" + id;
     }
 
-    public String taskPath(Long id) {
+    public static String taskPath(Long id) {
         return taskPath(String.valueOf(id));
     }
 
-    public String labelsPath() {
-        return labelsPath;
+    public static String labelsPath() {
+        return LABELS_PATH;
     }
 
-    public String labelPath(String id) {
-        return labelsPath + "/" + id;
+    public static String labelPath(String id) {
+        return LABELS_PATH + "/" + id;
     }
 
-    public String labelPath(Long id) {
+    public static String labelPath(Long id) {
         return labelPath(String.valueOf(id));
     }
 }

@@ -67,8 +67,6 @@ public class TaskControllerTest {
     private ObjectMapper mapper;
     @Autowired
     private JWTUtils jwtUtils;
-    @Autowired
-    private NamedRoutes routes;
     private String token;
     private Long userId;
     private Long statusId;
@@ -102,7 +100,7 @@ public class TaskControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var request = get(baseUrl + routes.tasksPath())
+        var request = get(baseUrl + NamedRoutes.tasksPath())
                 .header(HttpHeaders.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -129,7 +127,7 @@ public class TaskControllerTest {
 
         taskRepository.save(task);
 
-        var request = get(baseUrl + routes.tasksPath())
+        var request = get(baseUrl + NamedRoutes.tasksPath())
                 .queryParam("labelsId", label.getId().toString())
                 .header(HttpHeaders.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(request)
@@ -150,7 +148,7 @@ public class TaskControllerTest {
         data.setExecutorId(userId);
         data.setTaskStatusId(statusId);
 
-        var request = post(baseUrl + routes.tasksPath())
+        var request = post(baseUrl + NamedRoutes.tasksPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -169,7 +167,7 @@ public class TaskControllerTest {
         CreateTaskDTO data = new CreateTaskDTO();
         data.setDescription("Task description");
 
-        var request = post(baseUrl + routes.tasksPath())
+        var request = post(baseUrl + NamedRoutes.tasksPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -190,7 +188,7 @@ public class TaskControllerTest {
         data.setName("Task name");
         data.setTaskStatusId(statusId);
 
-        var request = post(baseUrl + routes.tasksPath())
+        var request = post(baseUrl + NamedRoutes.tasksPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -200,7 +198,7 @@ public class TaskControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.taskPath(taskId))
+        var request = get(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -216,7 +214,7 @@ public class TaskControllerTest {
     public void testUpdate() throws Exception {
         String updateJSON = "{\"name\":\"test\", \"description\":\"test\"}";
 
-        var request = put(baseUrl + routes.taskPath(taskId))
+        var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
@@ -233,7 +231,7 @@ public class TaskControllerTest {
     public void testUpdateError() throws Exception {
         String updateJSON = "{\"name\":\"\"}";
 
-        var request = put(baseUrl + routes.taskPath(taskId))
+        var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
@@ -250,7 +248,7 @@ public class TaskControllerTest {
     public void testUpdateNoAuth() throws Exception {
         String updateJSON = "{\"name\":\"test\", \"description\":\"test\"}";
 
-        var request = put(baseUrl + routes.taskPath(taskId))
+        var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
 
@@ -260,7 +258,7 @@ public class TaskControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        var request = delete(baseUrl + routes.taskPath(taskId))
+        var request = delete(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isOk());
@@ -272,7 +270,7 @@ public class TaskControllerTest {
 
     @Test
     public void testDeleteNoAuth() throws Exception {
-        var request = delete(baseUrl + routes.taskPath(taskId));
+        var request = delete(baseUrl + NamedRoutes.taskPath(taskId));
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
@@ -284,7 +282,7 @@ public class TaskControllerTest {
         String anotherToken = "Bearer " + jwtUtils.generateToken(userDTO.getEmail());
         userService.save(userDTO);
 
-        var request = delete(baseUrl + routes.taskPath(taskId))
+        var request = delete(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, anotherToken);
 
         var result = mockMvc.perform(request)

@@ -30,7 +30,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info(e.getMessage());
+        LOGGER.error(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -40,7 +40,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info(e.getMessage());
+        LOGGER.error(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -50,7 +50,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info(e.getMessage());
+        LOGGER.error(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -60,7 +60,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info(e.getMessage());
+        LOGGER.error(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
@@ -70,7 +70,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info("Request data is not valid!");
+        LOGGER.error("Request data is not valid!");
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -80,7 +80,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info("Permission denied!");
+        LOGGER.error("Permission denied!");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
@@ -90,7 +90,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage(),
                 System.currentTimeMillis());
 
-        LOGGER.info(e.getMessage());
+        LOGGER.error(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }

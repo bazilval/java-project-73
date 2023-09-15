@@ -48,14 +48,11 @@ public class AuthControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
-    private NamedRoutes routes;
-
     @Test
     public void testLogin() throws Exception {
         CreateUserDTO data = Instancio.of(createGenerator.getUserModel()).create();
 
-        var request = post(baseUrl + routes.usersPath())
+        var request = post(baseUrl + NamedRoutes.usersPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -65,7 +62,7 @@ public class AuthControllerTest {
         authDTO.setEmail(data.getEmail());
         authDTO.setPassword(data.getPassword());
 
-        var loginRequest = post(baseUrl + routes.loginPath())
+        var loginRequest = post(baseUrl + NamedRoutes.loginPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(authDTO));
 
@@ -77,7 +74,7 @@ public class AuthControllerTest {
         String updateJSON = "{\"firstName\":\"test\"}";
         User user = repository.findByEmail(data.getEmail()).get();
 
-        var updateRequest = put(baseUrl + routes.userPath(user.getId()))
+        var updateRequest = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
@@ -91,7 +88,7 @@ public class AuthControllerTest {
         authDTO.setEmail("wrongLogin");
         authDTO.setPassword("wrongPassword");
 
-        var loginRequest = post(baseUrl + routes.loginPath())
+        var loginRequest = post(baseUrl + NamedRoutes.loginPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(authDTO));
 

@@ -28,8 +28,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
     @Value("${base-url}")
     private String baseUrl;
-    @Autowired
-    private NamedRoutes routes;
     private final JwtDecoder jwtDecoder;
     private UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -54,10 +52,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
 
-                .requestMatchers(HttpMethod.POST, baseUrl + routes.loginPath()).permitAll()
+                .requestMatchers(HttpMethod.POST, baseUrl + NamedRoutes.loginPath()).permitAll()
 
-                .requestMatchers(HttpMethod.GET, baseUrl + routes.usersPath()).permitAll()
-                .requestMatchers(HttpMethod.POST, baseUrl + routes.usersPath()).permitAll()
+                .requestMatchers(HttpMethod.GET, baseUrl + NamedRoutes.usersPath()).permitAll()
+                .requestMatchers(HttpMethod.POST, baseUrl + NamedRoutes.usersPath()).permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

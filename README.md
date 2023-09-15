@@ -5,11 +5,25 @@
 
 # Task Manager
 
-Swagger: http://localhost:5001/swagger
+Deploy: https://my-task-manager-9201.onrender.com
+
+Swagger: https://my-task-manager-9201.onrender.com/swagger
 
 ## Overview
 This project is a Spring Boot web application that provides APIs for managing various resources: Labels, Statuses, Tasks, and Users. Closest reference is http://www.redmine.org/.
 It is implemented Spring Security 6 with JWT authentication and uses a stack of advanced technologies such as Liquibase, PostgreSQL and MapStruct.
+
+
+## Development
+
+``` bash
+make test
+```
+
+``` bash
+make backend
+#http://localhost:5001
+```
 
 ## Dependencies
 

@@ -66,8 +66,6 @@ public class LabelControllerTest {
     private ObjectMapper mapper;
     @Autowired
     private JWTUtils jwtUtils;
-    @Autowired
-    private NamedRoutes routes;
     private String token;
     private Long labelId;
     private Long statusId;
@@ -98,7 +96,7 @@ public class LabelControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var request = get(baseUrl + routes.labelsPath())
+        var request = get(baseUrl + NamedRoutes.labelsPath())
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         MvcResult result = mockMvc.perform(request)
@@ -112,7 +110,7 @@ public class LabelControllerTest {
     public void testCreate() throws Exception {
         LabelDTO data = new LabelDTO("Новый");
 
-        var request = post(baseUrl + routes.labelsPath())
+        var request = post(baseUrl + NamedRoutes.labelsPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -129,7 +127,7 @@ public class LabelControllerTest {
     public void testCreateError() throws Exception {
         LabelDTO data = new LabelDTO("");
 
-        var request = post(baseUrl + routes.labelsPath())
+        var request = post(baseUrl + NamedRoutes.labelsPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -147,7 +145,7 @@ public class LabelControllerTest {
     public void testCreateNoAuth() throws Exception {
         LabelDTO data = new LabelDTO("Новый");
 
-        var request = post(baseUrl + routes.labelsPath())
+        var request = post(baseUrl + NamedRoutes.labelsPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -157,7 +155,7 @@ public class LabelControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.labelPath(labelId))
+        var request = get(baseUrl + NamedRoutes.labelPath(labelId))
                 .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -172,7 +170,7 @@ public class LabelControllerTest {
     public void testUpdate() throws Exception {
         LabelDTO data = new LabelDTO("Новый");
 
-        var request = put(baseUrl + routes.labelPath(labelId))
+        var request = put(baseUrl + NamedRoutes.labelPath(labelId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -188,7 +186,7 @@ public class LabelControllerTest {
     public void testUpdateError() throws Exception {
         LabelDTO data = new LabelDTO("");
 
-        var request = put(baseUrl + routes.labelPath(labelId))
+        var request = put(baseUrl + NamedRoutes.labelPath(labelId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -205,7 +203,7 @@ public class LabelControllerTest {
     public void testUpdateNoAuth() throws Exception {
         LabelDTO data = new LabelDTO("Новый");
 
-        var request = put(baseUrl + routes.labelPath(labelId))
+        var request = put(baseUrl + NamedRoutes.labelPath(labelId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -215,7 +213,7 @@ public class LabelControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        var request = delete(baseUrl + routes.labelPath(labelId))
+        var request = delete(baseUrl + NamedRoutes.labelPath(labelId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         var result = mockMvc.perform(request).andReturn();
@@ -227,7 +225,7 @@ public class LabelControllerTest {
 
     @Test
     public void testDeleteNoAuth() throws Exception {
-        var request = delete(baseUrl + routes.labelPath(labelId));
+        var request = delete(baseUrl + NamedRoutes.labelPath(labelId));
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
@@ -247,7 +245,7 @@ public class LabelControllerTest {
 
         taskRepository.save(task);
 
-        var request = delete(baseUrl + routes.labelPath(labelId))
+        var request = delete(baseUrl + NamedRoutes.labelPath(labelId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isConflict());

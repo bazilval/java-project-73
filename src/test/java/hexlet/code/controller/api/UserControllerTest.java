@@ -73,9 +73,6 @@ public class UserControllerTest {
 
     @Autowired
     private JWTUtils jwtUtils;
-
-    @Autowired
-    private NamedRoutes routes;
     private String token;
 
 
@@ -92,7 +89,7 @@ public class UserControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult result = mockMvc.perform(get(baseUrl + routes.usersPath()))
+        MvcResult result = mockMvc.perform(get(baseUrl + NamedRoutes.usersPath()))
                 .andExpect(status().isOk())
                 .andReturn();
         String body = result.getResponse().getContentAsString();
@@ -103,7 +100,7 @@ public class UserControllerTest {
     public void testCreate() throws Exception {
         CreateUserDTO data = Instancio.of(createGenerator.getUserModel()).create();
 
-        var request = post(baseUrl + routes.usersPath())
+        var request = post(baseUrl + NamedRoutes.usersPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -120,7 +117,7 @@ public class UserControllerTest {
     public void testOneFieldCreateError() throws Exception {
         String updateJSON = "{\"firstName\":null}";
 
-        var request = post(baseUrl + routes.usersPath())
+        var request = post(baseUrl + NamedRoutes.usersPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
 
@@ -141,7 +138,7 @@ public class UserControllerTest {
         data.setPassword(("12"));
         data.setEmail(("notEmail"));
 
-        var request = post(baseUrl + routes.usersPath())
+        var request = post(baseUrl + NamedRoutes.usersPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -160,7 +157,7 @@ public class UserControllerTest {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = userService.save(userDTO);
 
-        var request = get(baseUrl + routes.userPath(user.getId()))
+        var request = get(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -181,7 +178,7 @@ public class UserControllerTest {
 
         UpdateUserDTO data = Instancio.of(updateGenerator.getUserModel()).create();
 
-        var request = put(baseUrl + routes.userPath(user.getId()))
+        var request = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -204,7 +201,7 @@ public class UserControllerTest {
 
         String updateJSON = "{\"firstName\":\"test\"}";
 
-        var request = put(baseUrl + routes.userPath(user.getId()))
+        var request = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJSON);
@@ -226,7 +223,7 @@ public class UserControllerTest {
         data.setPassword(JsonNullable.of("12"));
         data.setEmail(JsonNullable.of("notEmail"));
 
-        var request = put(baseUrl + routes.userPath(user.getId()))
+        var request = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -248,7 +245,7 @@ public class UserControllerTest {
         data.setPassword(JsonNullable.of("12"));
         data.setEmail(JsonNullable.of("notEmail"));
 
-        var request = put(baseUrl + routes.userPath(user.getId()))
+        var request = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -267,7 +264,7 @@ public class UserControllerTest {
         ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
-        var request = delete(baseUrl + routes.userPath(user.getId()))
+        var request = delete(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isOk());
@@ -282,7 +279,7 @@ public class UserControllerTest {
         CreateUserDTO userDTO = Instancio.of(createGenerator.getUserModel()).create();
         ResponseUserDTO user = userService.save(userDTO);
 
-        var request = delete(baseUrl + routes.userPath(user.getId()))
+        var request = delete(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         var result = mockMvc.perform(request)
@@ -311,7 +308,7 @@ public class UserControllerTest {
 
         taskRepository.save(task);
 
-        var request = delete(baseUrl + routes.userPath(user.getId()))
+        var request = delete(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isConflict());

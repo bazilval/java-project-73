@@ -60,8 +60,6 @@ public class StatusControllerTest {
     private ObjectMapper mapper;
     @Autowired
     private JWTUtils jwtUtils;
-    @Autowired
-    private NamedRoutes routes;
     private String token;
     private Long statusId;
     private Long userId;
@@ -86,7 +84,7 @@ public class StatusControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var request = get(baseUrl + routes.statusesPath())
+        var request = get(baseUrl + NamedRoutes.statusesPath())
                 .header(HttpHeaders.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -99,7 +97,7 @@ public class StatusControllerTest {
     public void testCreate() throws Exception {
         StatusDTO data = new StatusDTO("Новый");
 
-        var request = post(baseUrl + routes.statusesPath())
+        var request = post(baseUrl + NamedRoutes.statusesPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -116,7 +114,7 @@ public class StatusControllerTest {
     public void testCreateError() throws Exception {
         StatusDTO data = new StatusDTO("");
 
-        var request = post(baseUrl + routes.statusesPath())
+        var request = post(baseUrl + NamedRoutes.statusesPath())
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -134,7 +132,7 @@ public class StatusControllerTest {
     public void testCreateNoAuth() throws Exception {
         StatusDTO data = new StatusDTO("Новый");
 
-        var request = post(baseUrl + routes.statusesPath())
+        var request = post(baseUrl + NamedRoutes.statusesPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -144,7 +142,7 @@ public class StatusControllerTest {
 
     @Test
     public void testShow() throws Exception {
-        var request = get(baseUrl + routes.statusPath(statusId))
+        var request = get(baseUrl + NamedRoutes.statusPath(statusId))
                 .header(HttpHeaders.AUTHORIZATION, token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -159,7 +157,7 @@ public class StatusControllerTest {
     public void testUpdate() throws Exception {
         StatusDTO data = new StatusDTO("Новый");
 
-        var request = put(baseUrl + routes.statusPath(statusId))
+        var request = put(baseUrl + NamedRoutes.statusPath(statusId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -175,7 +173,7 @@ public class StatusControllerTest {
     public void testUpdateError() throws Exception {
         StatusDTO data = new StatusDTO("");
 
-        var request = put(baseUrl + routes.statusPath(statusId))
+        var request = put(baseUrl + NamedRoutes.statusPath(statusId))
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
@@ -192,7 +190,7 @@ public class StatusControllerTest {
     public void testUpdateNoAuth() throws Exception {
         StatusDTO data = new StatusDTO("Новый");
 
-        var request = put(baseUrl + routes.statusPath(statusId))
+        var request = put(baseUrl + NamedRoutes.statusPath(statusId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(data));
 
@@ -202,7 +200,7 @@ public class StatusControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        var request = delete(baseUrl + routes.statusPath(statusId))
+        var request = delete(baseUrl + NamedRoutes.statusPath(statusId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         var result = mockMvc.perform(request).andReturn();
@@ -214,7 +212,7 @@ public class StatusControllerTest {
 
     @Test
     public void testDeleteNoAuth() throws Exception {
-        var request = delete(baseUrl + routes.statusPath(statusId));
+        var request = delete(baseUrl + NamedRoutes.statusPath(statusId));
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
@@ -232,7 +230,7 @@ public class StatusControllerTest {
 
         taskRepository.save(task);
 
-        var request = delete(baseUrl + routes.statusPath(statusId))
+        var request = delete(baseUrl + NamedRoutes.statusPath(statusId))
                 .header(HttpHeaders.AUTHORIZATION, token);
 
         mockMvc.perform(request).andExpect(status().isConflict());

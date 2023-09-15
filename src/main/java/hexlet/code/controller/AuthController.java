@@ -37,7 +37,7 @@ public class AuthController {
                     }
             )
     })
-            @PostMapping("/login")
+    @PostMapping("/login")
     public String login(
             @Parameter(description = "Auth credentials") @RequestBody AuthDTO authDTO) {
         authService.authenticate(authDTO);
