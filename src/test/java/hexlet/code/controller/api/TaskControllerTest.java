@@ -14,6 +14,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.security.JWTUtils;
 import hexlet.code.service.TaskService;
 import hexlet.code.service.UserService;
+import hexlet.code.util.FileReader;
 import hexlet.code.util.ModelToCreateGenerator;
 import hexlet.code.util.NamedRoutes;
 import org.instancio.Instancio;
@@ -212,7 +213,7 @@ public class TaskControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        String updateJSON = "{\"name\":\"test\", \"description\":\"test\"}";
+        String updateJSON = FileReader.getResourceContent("UpdateTask");
 
         var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token)
@@ -229,7 +230,7 @@ public class TaskControllerTest {
 
     @Test
     public void testUpdateError() throws Exception {
-        String updateJSON = "{\"name\":\"\"}";
+        String updateJSON = FileReader.getResourceContent("WrongUpdateTask");
 
         var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .header(HttpHeaders.AUTHORIZATION, token)
@@ -246,7 +247,7 @@ public class TaskControllerTest {
     }
 
     public void testUpdateNoAuth() throws Exception {
-        String updateJSON = "{\"name\":\"test\", \"description\":\"test\"}";
+        String updateJSON = FileReader.getResourceContent("UpdateTask");
 
         var request = put(baseUrl + NamedRoutes.taskPath(taskId))
                 .contentType(MediaType.APPLICATION_JSON)

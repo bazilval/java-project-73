@@ -14,6 +14,7 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.security.JWTUtils;
 import hexlet.code.service.UserService;
+import hexlet.code.util.FileReader;
 import hexlet.code.util.ModelToCreateGenerator;
 import hexlet.code.util.ModelToUpdateGenerator;
 import hexlet.code.util.NamedRoutes;
@@ -115,11 +116,11 @@ public class UserControllerTest {
 
     @Test
     public void testOneFieldCreateError() throws Exception {
-        String updateJSON = "{\"firstName\":null}";
+        String createJSON = FileReader.getResourceContent("NullFirstName");
 
         var request = post(baseUrl + NamedRoutes.usersPath())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(updateJSON);
+                .content(createJSON);
 
         var result = mockMvc.perform(request)
                 .andExpect(status().isUnprocessableEntity())
@@ -199,7 +200,7 @@ public class UserControllerTest {
         ResponseUserDTO user = userService.save(userDTO);
         token = "Bearer " + jwtUtils.generateToken(user.getEmail());
 
-        String updateJSON = "{\"firstName\":\"test\"}";
+        String updateJSON = FileReader.getResourceContent("OnlyFirstName");
 
         var request = put(baseUrl + NamedRoutes.userPath(user.getId()))
                 .header(HttpHeaders.AUTHORIZATION, token)

@@ -7,6 +7,7 @@ import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.service.AuthService;
 import hexlet.code.service.UserService;
+import hexlet.code.util.FileReader;
 import hexlet.code.util.ModelToCreateGenerator;
 import hexlet.code.util.ModelToUpdateGenerator;
 import hexlet.code.util.NamedRoutes;
@@ -71,7 +72,7 @@ public class AuthControllerTest {
                 .andReturn();
 
         String token = "Bearer " + result.getResponse().getContentAsString();
-        String updateJSON = "{\"firstName\":\"test\"}";
+        String updateJSON = FileReader.getResourceContent("OnlyFirstName");
         User user = repository.findByEmail(data.getEmail()).get();
 
         var updateRequest = put(baseUrl + NamedRoutes.userPath(user.getId()))

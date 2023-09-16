@@ -20,7 +20,7 @@ java {
 }
 
 application {
-	mainClass.set("hexlet.code.Application")
+	mainClass.set("hexlet.code.AppApplication")
 }
 
 configurations {
