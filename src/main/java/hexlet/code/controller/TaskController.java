@@ -197,7 +197,7 @@ public class TaskController {
                 }
             )
     })
-    public void deleteStatus(
+    public void deleteTask(
             @Parameter(description = "Task id") @PathVariable("id") Long id) {
         service.deleteById(id);
 
